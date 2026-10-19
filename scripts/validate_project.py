@@ -50,7 +50,7 @@ def parse_skill_frontmatter(content: str) -> dict[str, str]:
         require(":" in line, f"Invalid frontmatter line {line_number}: {line!r}")
         key, value = line.split(":", 1)
         key = key.strip()
-        value = value.strip().strip("\\"'")
+        value = value.strip().strip("\"'")
         require(key not in metadata, f"Duplicate frontmatter key: {key}")
         metadata[key] = value
     return metadata
