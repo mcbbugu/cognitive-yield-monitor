@@ -1,0 +1,13 @@
+case_id,mode,expected_state,baseline_state,skill_state,baseline_warning,skill_warning,evidence_grounded_baseline,evidence_grounded_skill,next_step_useful_baseline,next_step_useful_skill,reviewer_agreement,notes
+loop-01,conceptual discussion,DIMINISHING RETURNS,,,,,,,,,,
+explore-01,open-ended research exploration,PRODUCTIVE UNCERTAINTY,,,,,,,,,,
+practice-01,deliberate learning practice,ADVANCING,,,,,,,,,,
+support-01,emotional support,ADVANCING,,,,,,,,,,
+progress-01,research discussion,ADVANCING,,,,,,,,,,
+close-01,task completion,READY TO CLOSE,,,,,,,,,,
+short-01,short conversation,INSUFFICIENT EVIDENCE,,,,,,,,,,
+brainstorm-01,creative brainstorming,ADVANCING,,,,,,,,,,
+decision-01,decision support,DIMINISHING RETURNS,,,,,,,,,,
+counterexample-01,argument evaluation,ADVANCING,,,,,,,,,,
+user-choice-01,user-requested free exploration,ADVANCING,,,,,,,,,,
+ambiguous-01,mixed discussion,INSUFFICIENT EVIDENCE,,,,,,,,,,
