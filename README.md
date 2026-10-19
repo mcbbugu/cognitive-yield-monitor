@@ -1,111 +1,98 @@
 # Cognitive Yield Monitor
 
-**A lightweight Agent Skill for noticing when an AI conversation is progressing, circling, or sitting in productive uncertainty.**
+**An experimental open-source Agent Skill for detecting when an AI conversation is advancing, exploring productively, or repeating itself.**
 
-> Don't just ask an AI to keep answering. Help it notice whether the next answer is likely to add something useful.
+> AI can keep answering long after a conversation stops moving forward. What if it could notice that—and help you choose a better next step?
 
-[简体中文说明](README.zh-CN.md)
+[简体中文](README.zh-CN.md) · [Core Skill](SKILL.md) · [Chinese Skill](SKILL.zh-CN.md) · [Evaluation protocol](docs/EXPERIMENT_PROTOCOL.md) · [Launch article (中文)](docs/launch-post.zh-CN.md)
 
-## Why this exists
+## The idea
 
-Conversational AI is good at continuing. It is less consistently good at saying, with reasons, that a discussion is repeating itself—or that it is too early to call a messy exploration unproductive.
+Most conversational systems are optimized to respond. Cognitive Yield Monitor adds a small but important question:
 
-Cognitive Yield Monitor adds a conservative reflection step. It tracks the user's goal, established insights, open questions, and recent progress, then recommends a next move when useful: test a claim, seek a counterexample, change frames, operationalize an idea, synthesize, or continue deliberately.
+**Is the next answer likely to help the user make progress toward their actual goal?**
 
-This is an **experimental conversation Skill**, not a scientific instrument and not an autonomous background monitor.
+The goal is not to make conversations shorter at all costs. Emotional support, deliberate practice, creative exploration, and research all have different definitions of progress. Sometimes repetition helps. Sometimes uncertainty is productive. Sometimes a discussion is circling—and should switch methods.
 
-## Design principles
+This Skill asks the model to track the user's goal, established insights, unresolved questions, evidence, and recent changes. When a status check would help, it can recommend testing a claim, finding a counterexample, changing frames, making an idea actionable, synthesizing, or continuing deliberately.
 
-- **Progress over verbosity:** a longer answer is not automatically a more valuable answer.
-- **Goal-relative value:** emotional support, practice, creative exploration, and research require different standards.
-- **Evidence before interruption:** repeated wording alone is not enough to trigger a warning.
-- **Protect productive uncertainty:** early-stage ideas can be messy before a useful concept emerges.
-- **Advisory, not controlling:** the user decides whether to continue.
-- **Honest limits:** the model must not claim to monitor hidden or unavailable context.
+## Five conversation states
 
-## Repository contents
+| State | Meaning |
+|---|---|
+| **ADVANCING** | A meaningful new insight, evidence item, inference, application, or goal-aligned development appears. |
+| **PRODUCTIVE UNCERTAINTY** | There is no settled answer yet, but useful questions, tensions, or distinctions are emerging. |
+| **DIMINISHING RETURNS** | Multiple recent substantive turns repeat existing ideas without meaningful new support or progress. |
+| **READY TO CLOSE** | The user's stated goal appears sufficiently met. |
+| **INSUFFICIENT EVIDENCE** | Available context is too short, ambiguous, or incomplete for a responsible judgment. |
 
-- `SKILL.md` — core Agent Skill instructions
-- `SKILL.zh-CN.md` — Chinese version
-- `README.md` / `README.zh-CN.md` — bilingual project overview
-- `references/rubric.md` — evaluation rubric and state definitions
-- `references/examples.md` — worked examples
-- `prompts/optional-always-on.md` — optional custom-instruction snippet
-- `evals/cases.json` — starter qualitative evaluation set
-- `scripts/validate_project.py` — dependency-free structure/data validation
-- `LICENSE`, `CHANGELOG.md`, `CONTRIBUTING.md`
+The warning threshold is intentionally conservative. A single repetitive answer is not enough. The Skill should explain what seems repeated, acknowledge uncertainty, and suggest a concrete next move. The user remains in control.
 
 ## Quick start
 
-1. Download or clone this directory.
-2. Load `SKILL.md` into an Agent Skills-compatible host, or adapt its instructions to your host's custom-instructions mechanism.
-3. Start with a long or substantive discussion. You can also explicitly ask: **“Evaluate the marginal cognitive return of this conversation so far.”**
-4. If the monitor flags repetition, ask it to test the core claim, find a counterexample, turn the idea into a research question, or summarize what's actually established.
+1. Clone or download this repository.
+2. Load `SKILL.md` into a host that supports Agent Skills, or adapt it to the host's supported custom-instruction mechanism.
+3. In a substantive conversation, ask: **“Evaluate the marginal cognitive return of this conversation so far.”**
+4. If the discussion appears to be circling, choose a different operation: test the claim, find a counterexample, define a measurable question, make a decision, or summarize what is actually established.
 
-### Host compatibility
+See [`SKILL.zh-CN.md`](SKILL.zh-CN.md) for the Chinese instructions.
 
-Agent Skills use a directory with a `SKILL.md` manifest and optional supporting resources. Support and installation steps vary by host and product version. See the official docs for [OpenAI Skills](https://developers.openai.com/api/docs/guides/tools-skills) and [Anthropic Agent Skills](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview).
+### Compatibility and limitations
 
-For Claude Code, install the directory under a location discovered by your setup, such as `~/.claude/skills/cognitive-yield-monitor/`. For other hosts, use their supported skill upload or skill-directory mechanism. If a host only supports custom instructions, `prompts/optional-always-on.md` is a starting point, not a guarantee of automatic execution.
+Skill support and installation differ by host and product version. Consult the official [OpenAI Skills documentation](https://developers.openai.com/api/docs/guides/tools-skills) and [Anthropic Agent Skills documentation](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview).
 
-**Important:** A loaded Skill is an instruction set, not a daemon. It cannot independently inspect every future message unless the host invokes it and provides the relevant conversation context.
+A Skill is an instruction set, **not an autonomous background process**. It cannot silently inspect every future message or access conversation history that the host has not provided. Whether it runs depends on the host loading and following it.
 
-## What it evaluates
+## How it is designed
 
-| Dimension | Question |
-|---|---|
-| Information | Did we add facts, evidence, or a useful distinction? |
-| Conceptual | Did a genuinely new frame or model emerge? |
-| Inferential | Did reasoning move forward or resolve a tension? |
-| Empirical | Did we identify something testable or verifiable? |
-| Practical | Did we improve a decision or produce something usable? |
-| Goal-fit | Did the exchange advance what the user actually wanted? |
+- **Goal-relative progress:** judge progress against what the user wants, not novelty alone.
+- **Evidence before interruption:** repeated wording alone does not prove a loop.
+- **Protect productive uncertainty:** an unresolved question can still be getting sharper.
+- **Mode-specific safeguards:** do not mistake emotional processing, practice, or divergent brainstorming for waste.
+- **User agency:** advise; do not take control or nag after the user chooses to continue.
+- **Honest claims:** this is a model judgment, not a scientific measure of cognition.
 
-These are lenses, not an objective universal score. A conversation may be valuable without being novel—for example, deliberate practice or emotional support.
+## Evaluate it instead of just believing it
 
-## The five states
+The repository includes a starter set of qualitative cases and a proposed controlled comparison:
 
-- `ADVANCING` — a meaningful new contribution appears.
-- `PRODUCTIVE UNCERTAINTY` — the discussion is messy, but new tensions or questions are emerging.
-- `DIMINISHING RETURNS` — several recent substantive turns mainly restate existing ideas without new support or progress.
-- `READY TO CLOSE` — the user's goal appears adequately met.
-- `INSUFFICIENT EVIDENCE` — there is not enough context for a reliable judgment.
+- [Starter evaluation cases](evals/cases.json)
+- [Evaluation instructions and reporting template](docs/EXPERIMENT_PROTOCOL.md)
+- [Worked examples](references/examples.md)
+- [Qualitative rubric](references/rubric.md)
 
-A visible warning should be conservative. It should name what repeated, explain what is missing, and suggest a concrete next move. It must not shame users or repeatedly interrupt them after they choose to continue.
+The initial cases are **test fixtures, not benchmark results**. No effectiveness claim should be made until the Skill has been compared against a baseline on matched examples and outputs have been reviewed. Measure false-positive interruptions separately from missed loops.
 
-## Try it
-
-See [`references/examples.md`](references/examples.md) for examples of repetition, productive uncertainty, practice, and emotional support. The initial evaluation set is in [`evals/cases.json`](evals/cases.json).
-
-Validate the repository structure with Python 3.9+ (no third-party dependencies):
+Run the packaging/data checks with Python 3.9+:
 
 ```bash
 python scripts/validate_project.py
 ```
 
-This validates package structure and evaluation-case format. It does **not** measure model quality or run an LLM-based benchmark.
+This checks repository structure and evaluation-case format. It does not evaluate model behavior.
 
-## Current scope and roadmap
+## Repository map
 
-### v0.1
+- `SKILL.md` / `SKILL.zh-CN.md` — English and Chinese Skill instructions
+- `README.md` / `README.zh-CN.md` — project overview
+- `references/` — rubric and worked examples
+- `evals/` — qualitative starter cases
+- `docs/EXPERIMENT_PROTOCOL.md` — proposed controlled evaluation
+- `docs/launch-post.zh-CN.md` — Chinese project introduction draft
+- `prompts/optional-always-on.md` — optional custom-instruction snippet
+- `scripts/validate_project.py` — dependency-free packaging validator
 
-- Portable Skill instructions
-- Chinese and English documentation
-- Conservative state definitions and mode-specific safeguards
-- Example conversations and a starter evaluation set
-- Dependency-free structural validator
+## Roadmap
 
-### Possible next steps
-
-- Run blind comparisons with and without the Skill across several models.
-- Add an LLM-as-judge evaluation protocol with human review and disagreement reporting.
-- Measure false-positive interruptions separately from missed repetition.
-- Build a host-specific middleware or independent monitor agent only if users show that a prompt-level Skill is insufficient.
+1. **Test the idea:** run matched baseline-versus-Skill evaluations across different conversation modes.
+2. **Study failure modes:** identify premature warnings, missed loops, and cases where the model mistakes uncertainty for stagnation.
+3. **Invite outside cases:** collect privacy-scrubbed examples from users and contributors.
+4. **Build only if needed:** consider host-specific middleware or a separate monitor agent if evidence shows a prompt-level Skill is insufficient.
 
 ## Contributing
 
-Please see [`CONTRIBUTING.md`](CONTRIBUTING.md). Especially useful contributions include counterexamples where the monitor interrupted too early, cases where it failed to detect a loop, and evaluations across different conversation types.
+The most useful contribution is not simply another feature. It is a case that challenges the design: a false alarm, a missed loop, a valuable repetition, or a conversation where the right answer is “not enough evidence.” See [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ## License
 
-MIT. See [`LICENSE`](LICENSE).
+MIT — see [`LICENSE`](LICENSE).
