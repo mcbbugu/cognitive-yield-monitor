@@ -1,0 +1,53 @@
+name: False positive / missed loop
+description: Report a case where the monitor warned too early or failed to notice repetition.
+title: "[Evaluation case]: "
+labels: ["evaluation"]
+body:
+  - type: dropdown
+    id: failure_type
+    attributes:
+      label: What happened?
+      options:
+        - False positive — valuable repetition was treated as stagnation
+        - Missed loop — repeated content was not detected
+        - Productive uncertainty was treated as stagnation
+        - Insufficient evidence was treated as certainty
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Conversation mode
+      options:
+        - Learning / deliberate practice
+        - Emotional support
+        - Creative exploration
+        - Research / argument
+        - Decision support
+        - General discussion
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: sanitized_context
+    attributes:
+      label: Sanitized context or summary
+      description: Remove names, personal identifiers, private details, and sensitive information. A short summary is enough.
+      placeholder: Describe the repeated content and what the monitor did.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What would a better judgment look like?
+      description: Explain the expected state and why.
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional notes
+      description: Model/version and settings are useful if available. Do not include private transcripts.
+    validations:
+      required: false
