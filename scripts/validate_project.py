@@ -17,6 +17,8 @@ EXPECTED_FILES = [
     "CONTRIBUTING.md", "CHANGELOG.md", "references/rubric.md",
     "references/examples.md", "prompts/optional-always-on.md",
     "evals/cases.json", "evals/README.md",
+    "docs/EXPERIMENT_PROTOCOL.md", "docs/launch-post.zh-CN.md",
+    "docs/results-template.csv",
 ]
 ALLOWED_STATES = {
     "ADVANCING", "PRODUCTIVE UNCERTAINTY", "DIMINISHING RETURNS",
@@ -98,6 +100,13 @@ def validate() -> list[str]:
     notes.append(f"Checked {len(EXPECTED_FILES)} required project files")
     notes.append(f"Validated Skill metadata (name={metadata['name']!r}, description_length={len(description)})")
     notes.append(f"Validated {len(cases)} evaluation cases with unique IDs and known states")
+    csv_lines = read_text("docs/results-template.csv").splitlines()
+    require(len(csv_lines) >= 2, "Results template must contain a header and at least one case row")
+    require(csv_lines[0].startswith("case_id,mode,expected_state,"), "Results template has an unexpected header")
+    require(len(csv_lines) - 1 == len(cases), "Results template row count must match evaluation cases")
+    protocol = read_text("docs/EXPERIMENT_PROTOCOL.md")
+    require("not a report of completed experiments" in protocol, "Protocol must distinguish proposed work from completed results")
+    notes.append("Validated results template and experiment protocol")
     notes.append("Confirmed both READMEs and key safeguards are present")
     return notes
 
