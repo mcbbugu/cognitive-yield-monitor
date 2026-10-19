@@ -1,0 +1,26 @@
+name: Suggest an improvement
+description: Propose a change to the Skill, rubric, or evaluation set.
+title: "[Proposal]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem are you trying to solve?
+      description: Describe the failure mode or missing capability.
+    validations:
+      required: true
+  - type: textarea
+    id: example
+    attributes:
+      label: Example or counterexample
+      description: Use a synthetic or privacy-scrubbed example whenever possible.
+    validations:
+      required: true
+  - type: textarea
+    id: tradeoffs
+    attributes:
+      label: Potential trade-offs
+      description: Could this change increase premature warnings, miss loops, or interfere with another conversation mode?
+    validations:
+      required: false
